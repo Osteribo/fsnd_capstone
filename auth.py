@@ -3,11 +3,14 @@ from flask import request, _request_ctx_stack, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
+from config import auth0_config
 
 
-AUTH0_DOMAIN = 'fsdn.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'fsnd-capstone'
+
+
+AUTH0_DOMAIN = auth0_config['AUTH0_DOMAIN']
+ALGORITHMS = auth0_config['ALGORITHMS']
+API_AUDIENCE = auth0_config['API_AUDIENCE']
 
 # AuthError Exception
 '''
