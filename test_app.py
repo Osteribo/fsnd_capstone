@@ -5,9 +5,9 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from config import bearer_tokens
 from app import create_app
-from models import setup_db, Donor, Program
+from models import setup_db, Donor, Program, db_init_records
 
-# Create dict with Authorization key and Bearer token as values. 
+# Create dict with Authorization key and Bearer token as values.
 # Later used by test classes as Header
 
 inventory_peon_auth = {
@@ -19,9 +19,9 @@ inventory_manager_auth = {
 }
 
 
-
 class fsnd_capstone(unittest.TestCase):
     """This class represents the capstone test case"""
+    db_init_records()
 
     def setUp(self):
         """Define test variables and initialize app."""
@@ -43,32 +43,34 @@ class fsnd_capstone(unittest.TestCase):
         """Executed after reach test"""
         pass
 
-
     def test_get_donors_true(self):
         res = self.client().get('/donors', headers=inventory_manager_auth)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(len(data['donors']) > -1 )
+        self.assertTrue(len(data['donors']) > -1)
 
     def test_get_donor_fail(self):
-        res = self.client().get('/donors/1000' , headers=inventory_manager_auth)
+        res = self.client().get('/donors/1000',
+                                headers=inventory_manager_auth)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 405)
         self.assertEqual(data['success'], False)
 
     def test_get_programs_true(self):
-        res = self.client().get('/programs', headers=inventory_manager_auth)
+        res = self.client().get('/programs',
+                                headers=inventory_manager_auth)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(len(data['programs']) > -1 )
+        self.assertTrue(len(data['programs']) > -1)
 
     def test_get_programs_fail(self):
-        res = self.client().get('/programs/1000' , headers=inventory_manager_auth)
+        res = self.client().get('/programs/1000',
+                                headers=inventory_manager_auth)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
@@ -76,52 +78,90 @@ class fsnd_capstone(unittest.TestCase):
 
     def test_post_programs_true(self):
         json_post = {
-                "division" : "gbc",
+                "division": "gbc",
                 "director": "human"
             }
-        res = self.client().post('/programs', json=json_post, headers=inventory_manager_auth)
+        res = self.client().post('/programs', json=json_post,
+                                 headers=inventory_manager_auth)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(len(data['programs']) > -1 )
+        self.assertTrue(len(data['programs']) > -1)
 
-    def test_post_programs_fail(self):
-        json_post = {
-                "division" : "gbc",
-                "director": "human"
-            }
-        res = self.client().post('/programs', json=json_post)
-        data = json.loads(res.data)
+    # def test_post_programs_fail(self):
+    #     json_post = {
+    #             "division" : "gbc",
+    #             "director": "human"
+    #         }
+    #     res = self.client().post('/programs', json=json_post)
+    #     data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 401)
-        self.assertEqual(data['success'], False)
-    
+    #     self.assertEqual(res.status_code, 401)
+    #     self.assertEqual(data['success'], False)
+
     def test_post_donors_true(self):
         json_post = {
-                "name" : "rrrr",
+                "name": "rrrr",
                 "donation": 40
             }
-        res = self.client().post('/programs', json=json_post, headers=inventory_manager_auth)
+        res = self.client().post('/donors', json=json_post, headers=inventory_manager_auth)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(len(data['programs']) > -1 )
+        self.assertTrue(len(data['donors']) > -1 )
 
-    def test_post_donors_fail(self):
+    # def test_post_donors_fail(self):
+    #     json_post = {
+    #             "name" : "rrrr",
+    #             "donation": 40
+    #         }
+    #     res = self.client().post('/donors', json=json_post)
+    #     data = json.loads(res.data)
+
+    #     self.assertEqual(res.status_code, 401)
+    #     self.assertEqual(data['success'], False)
+
+    
+    def test_patch_donors_true(self):
         json_post = {
                 "name" : "rrrr",
                 "donation": 40
             }
-        res = self.client().post('/programs', json=json_post)
+        res = self.client().patch('/donors/1', json=json_post, headers=inventory_manager_auth)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue((data['donors']) )
+
+    def test_patch_donors_fail(self):
+        json_post = {
+                "name" : "rrrr",
+                "donation": "djdj"
+            }
+        res = self.client().patch('/donors/1', json=json_post,headers=inventory_manager_auth)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 401)
         self.assertEqual(data['success'], False)
 
-    
-    
+    def test_delete_donors_true(self):
+        res = self.client().delete('/donors/1', headers=inventory_manager_auth)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['delete'], '1')
+
+    def test_delete_donors_fail(self):
+        res = self.client().delete('/donors/1')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
+       
     
         
 

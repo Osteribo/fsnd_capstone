@@ -6,9 +6,12 @@ import os
 # database_path= os.environ['DATABASE_URL']
 
 database_name = "fsnd_capstone"
-database_path = "postgres://{}:{}@{}/{}".format('alo', '1234', 'localhost:5432', database_name)
+database_path = "postgres://{}:{}@{}/{}".format('alo', '1234',
+                                                'localhost:5432',
+                                                database_name)
 
 db = SQLAlchemy()
+
 
 def db_drop_and_create_all():
     '''drops the database tables and starts fresh
@@ -18,30 +21,33 @@ def db_drop_and_create_all():
     db.create_all()
     db_init_records()
 
+
 def db_init_records():
     '''this will initialize the database with some test records.'''
 
     new_donor = (Donor(
-        name = 'Matthew',
-        donation = 'Male'
+        name='Matthew',
+        donation=500
         ))
 
     new_program = (Program(
-        division = 'Buckn Broncos',
-        director = 'That one human'
+        division='Buckn Broncos',
+        director='That one human'
         ))
-
 
     new_donor.insert()
     new_program.insert()
     db.session.commit()
+
+
 '''
 setup_db(app)
     binds a flask application and SQLAlchemy service
 '''
 
+
 def setup_db(app, database_path=database_path):
-    app.config["SQLALCHEMY_DATABASE_URI"]= database_path
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
@@ -53,13 +59,14 @@ Donor
 
 '''
 
+
 class Donor(db.Model):
-    __tablename__= "Donor"
+    __tablename__ = "Donor"
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
     donation = Column(Integer)
-    
+
     '''
     long()
         long form representation of the Drink model
@@ -68,8 +75,7 @@ class Donor(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'donation' : self.donation,
-           
+            'donation': self.donation
         }
     '''
     insert()
@@ -111,14 +117,15 @@ class Donor(db.Model):
     def __repr__(self):
         return json.dumps(self.long())
 
-    
 
 '''
 Product
  later implementation
 '''
+
+
 class Program(db.Model):
-    __tablename__="Program"
+    __tablename__ = "Program"
 
     id = Column(Integer, primary_key=True)
     division = Column(String)
@@ -128,10 +135,8 @@ class Program(db.Model):
         return {
             'id': self.id,
             'division': self.division,
-            'director' : self.director,
-           
+            'director': self.director
         }
-
 
     '''
     insert()
@@ -172,4 +177,3 @@ class Program(db.Model):
 
     def __repr__(self):
         return json.dumps(self.long())
-
