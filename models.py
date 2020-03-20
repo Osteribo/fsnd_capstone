@@ -3,12 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 import os
 
-# database_path= os.environ['DATABASE_URL']
+# adjust commenting as need for heroku or local use
 
-database_name = "fsnd_capstone"
-database_path = "postgres://{}:{}@{}/{}".format('alo', '1234',
-                                                'localhost:5432',
-                                                database_name)
+# Heroku
+database_path = os.environ['DATABASE_URL']
+
+# local
+# database_name = "fsnd_capstone"
+# database_path = "postgres://{}:{}@{}/{}".format('alo', '1234',
+#                                                 'localhost:5432',
+#                                                 database_name)
 
 db = SQLAlchemy()
 
