@@ -91,10 +91,8 @@ class fsnd_capstone(unittest.TestCase):
 
     def test_post_programs_fail(self):
         json_post = {
-                "division" : "gbc",
-                "director": "human"
             }
-        res = self.client().post('/programs', json=json_post)
+        res = self.client().post('/programs', headers=inventory_manager_auth)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 401)
@@ -114,13 +112,12 @@ class fsnd_capstone(unittest.TestCase):
 
     def test_post_donors_fail(self):
         json_post = {
-                "name" : "rrrr",
-                "donation": 40
+
             }
-        res = self.client().post('/donors', json=json_post)
+        res = self.client().post('/donors', headers=inventory_manager_auth)
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
 
     
@@ -157,10 +154,10 @@ class fsnd_capstone(unittest.TestCase):
         self.assertTrue(data['delete'])
 
     def test_delete_donors_fail(self):
-        res = self.client().delete('/donors/1')
+        res = self.client().delete('/donors/4', headers=inventory_manager_auth)
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
        
     

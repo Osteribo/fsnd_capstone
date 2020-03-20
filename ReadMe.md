@@ -92,7 +92,12 @@ Click on a link to directly get to the ressource.
    1. [GET /programs]
    2. [POST /programs]
 
+RBAC:
 
+1. Inventory Manager
+    a. has access to all methods
+2. Inventory Peon
+    a. has access to get and post methods
 # <a name="get-donors"></a>
 ### 1. GET /donors
 
