@@ -5,7 +5,7 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from config import bearer_tokens
 from app import create_app
-from models import setup_db, Donor, Program, db_init_records
+from models import setup_db, Donor, Program, db_init_records, db_drop_and_create_all
 
 # Create dict with Authorization key and Bearer token as values.
 # Later used by test classes as Header
@@ -21,7 +21,7 @@ inventory_manager_auth = {
 
 class fsnd_capstone(unittest.TestCase):
     """This class represents the capstone test case"""
-    db_init_records()
+    
 
     def setUp(self):
         """Define test variables and initialize app."""
@@ -31,7 +31,7 @@ class fsnd_capstone(unittest.TestCase):
         self.database_path = "postgres://{}/{}".format('localhost:5432',
                                                        self.database_name)
         setup_db(self.app, self.database_path)
-
+        db_drop_and_create_all()
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -89,16 +89,16 @@ class fsnd_capstone(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(len(data['programs']) > -1)
 
-    # def test_post_programs_fail(self):
-    #     json_post = {
-    #             "division" : "gbc",
-    #             "director": "human"
-    #         }
-    #     res = self.client().post('/programs', json=json_post)
-    #     data = json.loads(res.data)
+    def test_post_programs_fail(self):
+        json_post = {
+                "division" : "gbc",
+                "director": "human"
+            }
+        res = self.client().post('/programs', json=json_post)
+        data = json.loads(res.data)
 
-    #     self.assertEqual(res.status_code, 401)
-    #     self.assertEqual(data['success'], False)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
 
     def test_post_donors_true(self):
         json_post = {
@@ -112,19 +112,20 @@ class fsnd_capstone(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(len(data['donors']) > -1 )
 
-    # def test_post_donors_fail(self):
-    #     json_post = {
-    #             "name" : "rrrr",
-    #             "donation": 40
-    #         }
-    #     res = self.client().post('/donors', json=json_post)
-    #     data = json.loads(res.data)
+    def test_post_donors_fail(self):
+        json_post = {
+                "name" : "rrrr",
+                "donation": 40
+            }
+        res = self.client().post('/donors', json=json_post)
+        data = json.loads(res.data)
 
-    #     self.assertEqual(res.status_code, 401)
-    #     self.assertEqual(data['success'], False)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data['success'], False)
 
     
     def test_patch_donors_true(self):
+        db_init_records()
         json_post = {
                 "name" : "rrrr",
                 "donation": 40
@@ -134,17 +135,17 @@ class fsnd_capstone(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue((data['donors']) )
+        self.assertTrue((data['donors']))
 
-    def test_patch_donors_fail(self):
+    def test_patch_no_donor_fail(self):
         json_post = {
                 "name" : "rrrr",
-                "donation": "djdj"
+                "donation": 1000
             }
-        res = self.client().patch('/donors/1', json=json_post,headers=inventory_manager_auth)
+        res = self.client().patch('/donors/5', json=json_post,headers=inventory_manager_auth)
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
 
     def test_delete_donors_true(self):
@@ -153,7 +154,7 @@ class fsnd_capstone(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['delete'], '1')
+        self.assertTrue(data['delete'])
 
     def test_delete_donors_fail(self):
         res = self.client().delete('/donors/1')

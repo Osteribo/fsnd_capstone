@@ -110,33 +110,32 @@ def create_app(test_config=None):
     @app.route('/donors/<int:donor_id>', methods=['PATCH'])
     @requires_auth('patch:donors')
     def update_donor(payload, donor_id):
-        try:
-            body = request.get_json()
-            update_name = body.get('name')
-            update_donation = body.get('donation')
-            donor_to_update = Donor.query.filter(Donor.id == donor_id
-                                                 ).one_or_none()
-            if donor_to_update is None:
-                abort(404)
-            if update_name:
-                donor_to_update.name = update_name
-            if update_donation:
-                donor_to_update.donation = update_donation
-            donor_to_update.update()
+        body = request.get_json()
+        update_name = body.get('name')
+        update_donation = body.get('donation')
+        donor_to_update = Donor.query.filter(Donor.id == donor_id
+                                                ).one_or_none()
+        if donor_to_update is None:
+            abort(404)
+        if update_name:
+            donor_to_update.name = update_name
+        if update_donation:
+            donor_to_update.donation = update_donation
+        donor_to_update.update()
 
-            return jsonify({
-                'success': True,
-                'donors': [donor_to_update.long()]
-            })
-        except:
-            abort(401)
+        return jsonify({
+            'success': True,
+            'donors': [donor_to_update.long()]
+        })
+
 
     @app.route('/donors/<int:donor_id>', methods=['DELETE'])
     @requires_auth('delete:donors')
     def delete_donor(payload, donor_id):
-        try:
             donor_to_delete = Donor.query.filter(Donor.id ==
                                                  donor_id).one_or_none()
+            if donor_to_delete is None:
+                abort(404)
             donor_to_delete.delete()
 
             return jsonify({
@@ -144,8 +143,7 @@ def create_app(test_config=None):
                 'delete': donor_id
                 })
 
-        except:
-            abort(404)
+
 
     # Error Handlers
 
